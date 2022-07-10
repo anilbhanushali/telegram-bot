@@ -84,18 +84,22 @@ bot.hears("hello", ctx => {
 
 bot.on("text", async ctx => {
   const username:string = ctx.message.from.username || "";
+  const chat_id:string = ctx.message.chat.id;
+
   const url = ctx.update.message.text
 
-  const whitelisted_usernames = String(process.env.TELEGRAM_VALID_USERNAMES || "").split(",")
-  if(!whitelisted_usernames.includes(username)){
-    ctx.reply("too soon. your username is not whitelisted !");
-    return;
-  }
+  // const whitelisted_usernames = String(process.env.TELEGRAM_VALID_USERNAMES || "").split(",")
+  // if(!whitelisted_usernames.includes(username)){
+  //   ctx.reply("too soon. your username is not whitelisted !");
+  //   return;
+  // }
   
   if(!stringIsAValidUrl(url)){
-    ctx.reply("Invalid URL !");
+    ctx.reply(" 🤧 !");
     return;
   }
+
+  console.log({ url : url, from: JSON.stringify(ctx.message.from)})
 
   const imageBuffer = await getScreenshot(url)
   //reply to message
