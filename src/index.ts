@@ -2,7 +2,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import { Telegraf } from "telegraf";
 
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
 const minimal_args = [
   '--autoplay-policy=user-gesture-required',
   '--disable-background-networking',
