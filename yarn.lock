@@ -1187,10 +1187,10 @@ pupa@^2.0.1:
   dependencies:
     escape-goat "^2.0.0"
 
-puppeteer@^15.3.2:
+puppeteer-core@^15.3.2:
   version "15.3.2"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-15.3.2.tgz#62162739044d570ab9907f85b1e1bbcf52adc79e"
-  integrity sha512-6z4fTHCHTpG3Yu7zqP0mLfCmkNkgw5KSUfLAwuBabz9Pkqoe0Z08hqUx5GNxhhMgEo4YVOSPBshePA6zliznWQ==
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-15.3.2.tgz#d4f1bfcaa8922fc05d4afcd9442348f68a7e0a7a"
+  integrity sha512-Fmca9UzXmJkRrvGBgUmrffGD2BlulUTfsVefV1+vqfNm4PnlZ/U1bfD6X8XQ0nftyyg520tmSKd81yH3Z2tszg==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"
