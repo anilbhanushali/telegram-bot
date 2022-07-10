@@ -39,6 +39,7 @@ const minimal_args = [
   '--password-store=basic',
   '--use-gl=swiftshader',
   '--use-mock-keychain',
+  '--single-process'
 ];
 
 /*
@@ -65,7 +66,7 @@ bot.on("text", ctx => {
 
   puppeteer
   .launch({
-    userDataDir: './tmp',
+    //userDataDir: './tmp',
     headless: true,
     args: minimal_args,
     defaultViewport: {
