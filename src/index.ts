@@ -67,6 +67,7 @@ bot.on("text", ctx => {
   puppeteer
   .launch({
     //userDataDir: './tmp',
+    executablePath: "/usr/bin/chromium-browser",
     headless: true,
     args: minimal_args,
     defaultViewport: {
