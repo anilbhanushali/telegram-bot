@@ -1,14 +1,24 @@
 // @ts-ignore: Object is possibly 'null'.
 
 
+import * as dotenv from "dotenv";
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
 import bodyParser from "body-parser";
 import express from "express";
 import { URL } from "url";
-
 import { Telegraf } from "telegraf";
+import puppeteer from "puppeteer";
 
-import puppeteer from "puppeteer-core";
+
+
 const minimal_args = [
+  '--headless',
+  '--disable-setuid-sandbox',
+  '--no-sandbox',
+  '--disable-dev-shm-usage',
   '--autoplay-policy=user-gesture-required',
   '--disable-background-networking',
   '--disable-background-timer-throttling',
@@ -17,7 +27,6 @@ const minimal_args = [
   '--disable-client-side-phishing-detection',
   '--disable-component-update',
   '--disable-default-apps',
-  '--disable-dev-shm-usage',
   '--disable-domain-reliability',
   '--disable-extensions',
   '--disable-features=AudioServiceOutOfProcess',
@@ -29,7 +38,6 @@ const minimal_args = [
   '--disable-print-preview',
   '--disable-prompt-on-repost',
   '--disable-renderer-backgrounding',
-  '--disable-setuid-sandbox',
   '--disable-speech-api',
   '--disable-sync',
   '--hide-scrollbars',
@@ -39,7 +47,6 @@ const minimal_args = [
   '--no-default-browser-check',
   '--no-first-run',
   '--no-pings',
-  '--no-sandbox',
   '--no-zygote',
   '--password-store=basic',
   '--use-gl=swiftshader',
@@ -48,9 +55,7 @@ const minimal_args = [
 ];
 
 const launch_options = {
-  //userDataDir: './tmp',
-  executablePath: "/usr/bin/chromium-browser",
-  headless: true,
+  userDataDir: './tmp',
   args: minimal_args,
   defaultViewport: {
     width: 1280,
@@ -100,19 +105,35 @@ bot.on("text", async ctx => {
   }
 
   console.log({ url : url, from: JSON.stringify(ctx.message.from)})
-
-  const imageBuffer = await getScreenshot(url)
-  //reply to message
-  ctx.replyWithPhoto({
-    source: imageBuffer
-  })
+  try{
+    const imageBuffer = await getScreenshot(url)
+    //reply to message
+    ctx.replyWithPhoto({
+      source: imageBuffer
+    })
+  }catch(e){
+    console.error(e)
+    ctx.reply("errorrrrrrrrrrrrrrrrrrrrrrrrr !");
+  }
 
 });
 
 bot.launch();
 
-const getScreenshot = async (url:string) => {
-  const browser = await puppeteer.launch(launch_options);
+const getScreenshot = async (url:string, viewport:string="") => {
+  console.log(url,viewport)
+
+  let _launch_options = {
+    ...launch_options
+  };
+
+  if(viewport){
+    let [width,height] = viewport.split('x').map(x=>parseInt(x))
+    _launch_options.defaultViewport.width = width;
+    _launch_options.defaultViewport.height = height;
+  }
+
+  const browser = await puppeteer.launch(_launch_options);
   const page = await browser.newPage()
   await page.goto(url,{
     waitUntil: 'networkidle2'
@@ -129,11 +150,16 @@ const getScreenshot = async (url:string) => {
   return result;
 }
 
-const sendScreenshot = async (url:string, chat_id:string) => {
-  const imageBuffer:Buffer = await getScreenshot(url)
-  bot.telegram.sendPhoto(chat_id, {
-    source: imageBuffer
-  })
+const sendScreenshot = async (url:string, chat_id:string, viewport:string) => {
+  try{
+    const imageBuffer:Buffer = await getScreenshot(url,viewport)
+    bot.telegram.sendPhoto(chat_id, {
+      source: imageBuffer
+    })
+  }catch(e){
+    console.error(e)
+    bot.telegram.sendMessage(chat_id, `Error..`)
+  }
 }
 
 const app = express();
@@ -151,12 +177,13 @@ app.get("/send-screenshot",async(req,res) => {
   
   let url = String(req.query.url || "");
   let chat_id = String(req.query.chat_id || "");
+  let viewport=String(req.query.viewport || "");
   
   if(!url || !chat_id){
     return res.json({status:"error",message:"url or chat_id is missing"})
   }
 
-  await sendScreenshot(url, chat_id);
+  await sendScreenshot(url, chat_id,viewport);
 
   return res.json({status:"success"})
 })
